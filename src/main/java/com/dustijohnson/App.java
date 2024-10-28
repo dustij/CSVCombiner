@@ -70,7 +70,7 @@ public class App extends Application
             if (sourceDirectory.isEmpty().get()) {
                 directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
             } else {
-                // TODO: handle IllegalArgumentException when folder parameter is not valid, display user friendly message?
+                // TODO: handle IllegalArgumentException when folder parameter is not valid, display user friendly message? #1
                 directoryChooser.setInitialDirectory(new File(sourceDirectory.get()));
             }
             File dir = directoryChooser.showDialog(stage);
