@@ -1,0 +1,21 @@
+.root {
+    heading-color: #000000;
+    label-color: #0f0f0f;
+    bound-color: #1f1f1f;
+}
+
+.heading-label {
+    -fx-text-fill: heading-color;
+    -fx-font-size: 20px;
+}
+
+.directory-label {
+    -fx-text-fill: label-color;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.bound-label {
+    -fx-text-fill: bound-color;
+    -fx-font-size: 14px;
+}
