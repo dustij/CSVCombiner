@@ -11,6 +11,7 @@ public class CSVModel
 {
     private final StringProperty csvDirectory = new SimpleStringProperty("");
     // TODO: using this property, improve user experience by displaying message why it may not be ok to merge
+    // Issue URL: https://github.com/dustij/CSVCombiner/issues/4
     private final BooleanProperty okToMerge = new SimpleBooleanProperty(false);
 
     public String getCsvDirectory()
