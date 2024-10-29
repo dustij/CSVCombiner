@@ -72,8 +72,6 @@ public class App extends Application
                 // Default location is user home
                 directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
             } else {
-                // TODO: testing issues workflow
-                // Issue URL: https://github.com/dustij/CSVCombiner/issues/2
                 directoryChooser.setInitialDirectory(new File(sourceDirectory.get()));
             }
             File dir = directoryChooser.showDialog(stage);
