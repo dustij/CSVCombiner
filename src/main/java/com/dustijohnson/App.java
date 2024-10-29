@@ -54,9 +54,10 @@ public class App extends Application
     private Node createSourceInput()
     {
         Label label = new Label("Source Directory: ");
-        TextField textField = new TextField("");
-        textField.textProperty().bindBidirectional(sourceDirectory);
-        HBox hBox = new HBox(6, label, textField);
+        Label chosen = new Label("");
+        chosen.setPrefWidth(200);
+        chosen.textProperty().bind(sourceDirectory);
+        HBox hBox = new HBox(6, label, chosen);
         hBox.setAlignment(Pos.CENTER);
         return hBox;
     }
@@ -68,9 +69,9 @@ public class App extends Application
             DirectoryChooser directoryChooser = new DirectoryChooser();
             directoryChooser.setTitle("Select Source Directory");
             if (sourceDirectory.isEmpty().get()) {
+                // Default location is user home
                 directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
             } else {
-                // TODO: handle IllegalArgumentException when folder parameter is not valid, display user friendly message? #1
                 directoryChooser.setInitialDirectory(new File(sourceDirectory.get()));
             }
             File dir = directoryChooser.showDialog(stage);
