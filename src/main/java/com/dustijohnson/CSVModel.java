@@ -3,6 +3,7 @@ package com.dustijohnson;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public class CSVModel
@@ -24,8 +25,8 @@ public class CSVModel
         csvDirectory.set(directory);
     }
 
-    public void setCsvDirectory(Path directory)
+    public void setCsvDirectory(File directory)
     {
-        csvDirectory.set(directory.toString());
+        System.out.println(getCsvDirectory());
     }
 }

@@ -39,6 +39,8 @@ public class CSVVIewBuilder implements Builder<Region>
     public Region build()
     {
         BorderPane results = new BorderPane();
+        results.setPrefSize(680, 600);
+        results.setPadding(new Insets(20));
         results.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/css/csv-view.css")).toExternalForm());
         results.setTop(headingLabel("Combine CSV Files"));
         results.setCenter(createCenter());
@@ -82,10 +84,10 @@ public class CSVVIewBuilder implements Builder<Region>
         return styledLabel(contents, cssClasses.get("directoryLabel"));
     }
 
-    private Node boundLabel(StringProperty boundProperty)
+    private Label boundLabel(StringProperty boundProperty)
     {
-        Node label = styledLabel("", cssClasses.get("boundLabel"));
-        label.accessibleTextProperty().bind(boundProperty);
+        Label label = (Label) styledLabel("", cssClasses.get("boundLabel"));
+        label.textProperty().bind(boundProperty);
         return label;
     }
 
