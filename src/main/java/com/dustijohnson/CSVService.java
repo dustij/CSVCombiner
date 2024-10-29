@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// This class is not used, will be deleted in the future, keeping to view code for later
 public class CSVService
 {
     public static List<Path> getFiles(String directory)
