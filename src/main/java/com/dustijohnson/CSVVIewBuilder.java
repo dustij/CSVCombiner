@@ -73,6 +73,7 @@ public class CSVVIewBuilder implements Builder<Region>
     private Node filesBox()
     {
         return new HBox(); // TODO: display files in chosen directory
+        return new HBox(); // Issue URL: https://github.com/dustij/CSVCombiner/issues/3
     }
 
     private Node directoryLabel(String contents)
