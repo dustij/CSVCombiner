@@ -16,6 +16,9 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * JavaFX App
@@ -55,6 +58,7 @@ public class App extends Application
     {
         Label label = new Label("Source Directory: ");
         Label chosen = new Label("");
+        chosen.setWrapText(true);
         chosen.setPrefWidth(200);
         chosen.textProperty().bind(sourceDirectory);
         HBox hBox = new HBox(6, label, chosen);
@@ -75,8 +79,19 @@ public class App extends Application
                 directoryChooser.setInitialDirectory(new File(sourceDirectory.get()));
             }
             File dir = directoryChooser.showDialog(stage);
-            if (dir != null) sourceDirectory.set(dir.toString());
+            if (dir != null) {
+                sourceDirectory.set(dir.toString());
+                displayCSVFiles();
+            }
         });
         return button;
+    }
+
+    private void displayCSVFiles()
+    {
+        List<Path> csvFiles = CSVService.getFiles(sourceDirectory.get());
+        for (Path file : Objects.requireNonNull(csvFiles)) {
+            System.out.println(file);
+        }
     }
 }
