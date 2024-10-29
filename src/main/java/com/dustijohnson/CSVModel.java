@@ -1,14 +1,17 @@
 package com.dustijohnson;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
 import java.io.File;
-import java.nio.file.Path;
 
 public class CSVModel
 {
     private final StringProperty csvDirectory = new SimpleStringProperty("");
+    // TODO: using this property, improve user experience by displaying message why it may not be ok to merge
+    private final BooleanProperty okToMerge = new SimpleBooleanProperty(false);
 
     public String getCsvDirectory()
     {
@@ -27,6 +30,21 @@ public class CSVModel
 
     public void setCsvDirectory(File directory)
     {
-        System.out.println(getCsvDirectory());
+        csvDirectory.set(directory.toString());
+    }
+
+    public boolean isOkToMerge()
+    {
+        return okToMerge.get();
+    }
+
+    public BooleanProperty okToMergeProperty()
+    {
+        return okToMerge;
+    }
+
+    public void setOkToMerge(boolean isOK)
+    {
+        okToMerge.set(isOK);
     }
 }

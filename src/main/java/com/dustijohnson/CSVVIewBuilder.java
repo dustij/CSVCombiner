@@ -95,8 +95,10 @@ public class CSVVIewBuilder implements Builder<Region>
     {
         Button chooseButton = new Button("Choose");
         chooseButton.setOnAction(e -> chooseHandler.run());
+
         Button mergeButton = new Button("Merge");
         mergeButton.setOnAction(e -> mergeHandler.run());
+        mergeButton.disableProperty().bind(model.okToMergeProperty().not());
 
         HBox results = new HBox(10, chooseButton, mergeButton);
         results.setAlignment(Pos.CENTER);

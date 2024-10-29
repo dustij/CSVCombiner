@@ -6,13 +6,13 @@ import javafx.util.Builder;
 public class CSVController
 {
     private final Builder<Region> viewBuilder;
-    private final CSVInteractor interactor;
+    private final CSVInteract interact;
 
     public CSVController()
     {
         CSVModel model = new CSVModel();
-        interactor = new CSVInteractor(model);
-        viewBuilder = new CSVVIewBuilder(model, interactor::mergeFiles, interactor::chooseDirectory);
+        interact = new CSVInteract(model);
+        viewBuilder = new CSVVIewBuilder(model, interact::mergeFiles, interact::chooseDirectory);
     }
 
     public Region getView()
