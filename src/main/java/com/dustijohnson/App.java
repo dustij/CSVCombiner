@@ -72,6 +72,7 @@ public class App extends Application
                 // Default location is user home
                 directoryChooser.setInitialDirectory(new File(System.getProperty("user.home")));
             } else {
+                // TODO: testing issues workflow
                 directoryChooser.setInitialDirectory(new File(sourceDirectory.get()));
             }
             File dir = directoryChooser.showDialog(stage);
