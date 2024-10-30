@@ -6,13 +6,18 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Builder;
 
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -22,6 +27,7 @@ public class CSVVIewBuilder implements Builder<Region>
     private final Runnable mergeHandler;
     private final Runnable chooseHandler;
     private final Map<String, String> cssClasses;
+    private final TableView<CSVFileRow> tableView;
 
     public CSVVIewBuilder(CSVModel model, Runnable mergeHandler, Runnable chooseHandler)
     {
@@ -33,6 +39,8 @@ public class CSVVIewBuilder implements Builder<Region>
         this.model = model;
         this.mergeHandler = mergeHandler;
         this.chooseHandler = chooseHandler;
+
+        tableView = new TableView<>();
     }
 
     @Override
@@ -46,6 +54,12 @@ public class CSVVIewBuilder implements Builder<Region>
         results.setCenter(createCenter());
         results.setBottom(createButtons());
         return results;
+    }
+
+    public void setFiles(List<Path> files)
+    {
+        tableView.getItems().clear();
+        files.forEach(f -> tableView.getItems().add(new CSVFileRow(f.getFileName().toString(), "Pending")));
     }
 
     private Node headingLabel(String contents)
@@ -74,9 +88,20 @@ public class CSVVIewBuilder implements Builder<Region>
 
     private Node filesBox()
     {
-        // TODO: display files in chosen directory
-        // Issue URL: https://github.com/dustij/CSVCombiner/issues/3
-        return new HBox();
+        HBox hBox = new HBox(6);
+
+        TableColumn<CSVFileRow, String> fileNameColumn = new TableColumn<>("File Name");
+        fileNameColumn.setPrefWidth(400);
+        fileNameColumn.setCellValueFactory(new PropertyValueFactory<>("fileName"));
+
+        TableColumn<CSVFileRow, String> statusColumn = new TableColumn<>("Status");
+        statusColumn.setPrefWidth(150);
+        fileNameColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        tableView.getColumns().add(fileNameColumn);
+        tableView.getColumns().add(statusColumn);
+        hBox.getChildren().add(tableView);
+        return hBox;
     }
 
     private Node directoryLabel(String contents)
