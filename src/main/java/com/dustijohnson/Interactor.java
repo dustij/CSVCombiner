@@ -5,22 +5,20 @@ import javafx.stage.Popup;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Interactor
 {
     private final Model model;
-    private final CsvService csvService;
+    private final Service service;
 
-    public Interactor(Model model, CsvService csvService)
+    public Interactor(Model model, Service csvService)
     {
         this.model = model;
-        this.csvService = csvService;
+        this.service = csvService;
     }
 
     public void updateModel()
@@ -30,7 +28,7 @@ public class Interactor
     public void getFiles()
     {
         try {
-            List<Path> files = csvService.getCsvFiles(model.getInDirectory());
+            List<Path> files = service.getCsvFiles(model.getInDirectory());
             model.getFileStatuses().clear();
             files.forEach(path -> model.addFileStatus(new FileStatus(path, "Pending")));
         } catch (IOException e) {
@@ -43,7 +41,7 @@ public class Interactor
     {
         boolean allValid = true;
         for (FileStatus fileStatus : model.getFileStatuses()) {
-            boolean isValid = csvService.validateCsvFile(fileStatus.getFilePath());
+            boolean isValid = service.validateCsvFile(fileStatus.getFilePath());
             fileStatus.setStatus(isValid ? "Valid" : "Invalid");
             if (!isValid) allValid = false;
         }
@@ -53,16 +51,16 @@ public class Interactor
     public void mergeFiles()
     {
         try {
-            List<Path> validFiles = csvService.getCsvFiles(model.getInDirectory())
-                                              .stream()
-                                              .filter(path -> model.getFileStatuses()
+            List<Path> validFiles = service.getCsvFiles(model.getInDirectory())
+                                           .stream()
+                                           .filter(path -> model.getFileStatuses()
                                                                    .stream()
                                                                    .anyMatch(fileStatus -> fileStatus.getFileName()
                                                                                                      .equals(path.getFileName()
                                                                                                                  .toString()) && "Valid".equals(
                                                                            fileStatus.getStatus())))
-                                              .collect(Collectors.toList());
-            csvService.mergeCsvFiles(
+                                           .collect(Collectors.toList());
+            service.mergeCsvFiles(
                     validFiles,
                     Path.of(System.getProperty("user.dir"),
                             "output",
@@ -78,13 +76,13 @@ public class Interactor
     {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(model.getInDirectory().isEmpty()
-                                                     ? new File(System.getProperty("user.home"))
+                                                     ? new File(System.getProperty("user.dir"))
                                                      : new File(model.getInDirectory()));
 
         File dir = directoryChooser.showDialog(new Popup());
         if (dir != null) {
             model.setInDirectory(dir.toString());
-            csvService.resetExpectedHeaders();
+            service.resetExpectedHeaders();
             getFiles();
             validateFiles();
         }

@@ -1,13 +1,18 @@
 package com.dustijohnson;
 
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CsvService
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+
+public class Service
 {
     private List<String> expectedHeaders;
 
@@ -43,7 +48,24 @@ public class CsvService
     {
         // Ensure output directory exists
         Files.createDirectories(outputFile.getParent());
-        System.out.println("merging");
+        for (Path filePath : files) {
+            try (Reader reader = new FileReader(filePath.toFile())) {
+                // This will  parse the header names from the first record and skip the first record when iterating
+                Iterable<CSVRecord> records = CSVFormat.DEFAULT.builder()
+                                                               .setHeader()
+                                                               .setSkipHeaderRecord(true)
+                                                               .build()
+                                                               .parse(reader);
+                for (CSVRecord record : records) {
+                    System.out.println(record);
+                    // Get by header or index
+                    System.out.print("Get by header: ");
+                    System.out.println(record.get("colOne"));
+                    System.out.print("Get by index: ");
+                    System.out.println(record.get(0));
+                }
+            }
+        }
     }
 
     private List<String> readHeaders(Path filePath) throws IOException
