@@ -40,7 +40,6 @@ public class Controller
             }
         };
         mergeTask.setOnSucceeded(workerStateEvent -> {
-            interactor.updateModel();
             postActionGuiCleanup.run();
         });
         Thread mergeThread = new Thread(mergeTask);

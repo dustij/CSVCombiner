@@ -8,14 +8,13 @@ import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Popup;
+import javafx.stage.Window;
 import javafx.util.Builder;
 
 import java.util.HashMap;
@@ -77,7 +76,13 @@ public class ViewBuilder implements Builder<Region>
 
     private Node directoryInfo()
     {
-        return new HBox(6, directoryLabel("Merge csv files located in:"), boundLabel(model.inDirectoryProperty()));
+        Button chooseButton = new Button("Choose");
+        chooseButton.setOnAction(e -> chooseHandler.accept(() -> {}));
+        return new VBox(
+                6,
+                chooseButton,
+                directoryLabel("Merge csv files located in:"),
+                boundLabel(model.inDirectoryProperty()));
     }
 
     private Node tableView()
@@ -110,22 +115,23 @@ public class ViewBuilder implements Builder<Region>
 
     private Node createButtons()
     {
-        Button chooseButton = new Button("Choose");
-        chooseButton.setOnAction(e -> chooseHandler.accept(() -> {}));
-
         Button mergeButton = new Button("Merge");
         BooleanProperty mergeRunning = new SimpleBooleanProperty(false);
         mergeButton.disableProperty().bind(Bindings.createBooleanBinding(
-                () -> (!model.okToMergeProperty()
-                             .get() || mergeRunning.get()),
+                () -> (!model.okToMergeProperty().get() || mergeRunning.get()),
                 model.okToMergeProperty(),
                 mergeRunning));
         mergeButton.setOnAction(e -> {
             mergeRunning.set(true);
             actionHandler.accept(() -> mergeRunning.set(false));
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Merge Complete");
+            alert.setHeaderText(null);
+            alert.setContentText("The CSV files have been merged.");
+            alert.showAndWait();
         });
 
-        HBox results = new HBox(10, chooseButton, mergeButton);
+        HBox results = new HBox(10, mergeButton);
         results.setAlignment(Pos.CENTER);
         return results;
     }

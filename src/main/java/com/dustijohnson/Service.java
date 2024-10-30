@@ -1,11 +1,12 @@
 package com.dustijohnson;
 
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,6 +49,11 @@ public class Service
     {
         // Ensure output directory exists
         Files.createDirectories(outputFile.getParent());
+
+        // Set to keep unique rows
+        Set<Row> uniqueRows = new HashSet<>();
+
+        // Read files
         for (Path filePath : files) {
             try (Reader reader = new FileReader(filePath.toFile())) {
                 // This will  parse the header names from the first record and skip the first record when iterating
@@ -57,13 +63,19 @@ public class Service
                                                                .build()
                                                                .parse(reader);
                 for (CSVRecord record : records) {
-                    System.out.println(record);
-                    // Get by header or index
-                    System.out.print("Get by header: ");
-                    System.out.println(record.get("colOne"));
-                    System.out.print("Get by index: ");
-                    System.out.println(record.get(0));
+                    Row row = new Row(record);
+                    uniqueRows.add(row);
                 }
+            }
+        }
+
+        // Write file
+        try (BufferedWriter writer = Files.newBufferedWriter(outputFile)) {
+            writer.write(String.join(",", expectedHeaders));
+            writer.newLine();
+            for (Row row : uniqueRows) {
+                writer.write(row.toString());
+                writer.newLine();
             }
         }
     }
@@ -75,4 +87,40 @@ public class Service
             return headerLine != null ? List.of(headerLine.split(",")) : List.of();
         }
     }
+
+    // Row class for unique comparison
+    private class Row
+    {
+        private final List<String> columns;
+
+        public Row(CSVRecord record)
+        {
+            columns = new ArrayList<>();
+            record.forEach(columns::add);
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Row row = (Row) o;
+            return Objects.equals(columns, row.columns);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hashCode(columns);
+        }
+
+        @Override
+        public String toString()
+        {
+            // Format row as csv line
+            return String.join(",", columns);
+        }
+    }
+
+
 }

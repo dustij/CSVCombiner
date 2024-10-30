@@ -21,10 +21,6 @@ public class Interactor
         this.service = csvService;
     }
 
-    public void updateModel()
-    {
-    }
-
     public void getFiles()
     {
         try {
