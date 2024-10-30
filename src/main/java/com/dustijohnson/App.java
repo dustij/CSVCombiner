@@ -9,6 +9,7 @@ public class App extends Application
     @Override
     public void start(Stage stage) throws Exception
     {
+        stage.setTitle("CSV Combiner");
         stage.setScene(new Scene(new Controller().getView()));
         stage.show();
     }

@@ -12,7 +12,7 @@ public class Controller
     public Controller()
     {
         model = new Model();
-        interactor = new Interactor(model);
+        interactor = new Interactor(model, new CsvService());
         viewBuilder = new ViewBuilder(model, this::mergeFiles, this::chooseDirectory);
         setPropertyListener();
     }
