@@ -13,8 +13,14 @@ public class Controller
     {
         model = new Model();
         interactor = new Interactor(model);
-        viewBuilder = new ViewBuilder(model, this::mergeFiles);
+        viewBuilder = new ViewBuilder(model, this::mergeFiles, this::chooseDirectory);
         setPropertyListener();
+    }
+
+    private void chooseDirectory(Runnable postActionGuiCleanup)
+    {
+        interactor.chooseDirectory();
+        postActionGuiCleanup.run();
     }
 
     public Region getView()
@@ -24,7 +30,8 @@ public class Controller
 
     private void mergeFiles(Runnable postActionGuiCleanup)
     {
-        Task<Void> mergeTask = new Task<Void>() {
+        Task<Void> mergeTask = new Task<Void>()
+        {
             @Override
             protected Void call() throws Exception
             {
@@ -42,6 +49,7 @@ public class Controller
 
     private void setPropertyListener()
     {
+        // When directory property changes, it calls a method in the interactor to do the work
         model.inDirectoryProperty().addListener(observable -> interactor.getFiles());
     }
 }

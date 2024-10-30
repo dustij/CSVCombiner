@@ -1,11 +1,17 @@
 package com.dustijohnson;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -21,9 +27,10 @@ public class ViewBuilder implements Builder<Region>
 {
     private final Model model;
     private final Consumer<Runnable> actionHandler;
+    private final Consumer<Runnable> chooseHandler;
     private final Map<String, String> cssClasses;
 
-    public ViewBuilder(Model model, Consumer<Runnable> actionHandler)
+    public ViewBuilder(Model model, Consumer<Runnable> mergeHandler, Consumer<Runnable> chooseHandler)
     {
         cssClasses = new HashMap<>();
         cssClasses.put("headingLabel", "heading-label");
@@ -31,7 +38,8 @@ public class ViewBuilder implements Builder<Region>
         cssClasses.put("boundLabel", "bound-label");
 
         this.model = model;
-        this.actionHandler = actionHandler;
+        this.actionHandler = mergeHandler;
+        this.chooseHandler = chooseHandler;
     }
 
     @Override
@@ -40,7 +48,8 @@ public class ViewBuilder implements Builder<Region>
         BorderPane results = new BorderPane();
         results.setPrefSize(680, 600);
         results.setPadding(new Insets(20));
-        results.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/css/csv-view.css")).toExternalForm());
+        results.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/css/csv-view.css"))
+                                            .toExternalForm());
         results.setTop(headingLabel("Combine CSV Files"));
         results.setCenter(createCenter());
         results.setBottom(createButtons());
@@ -61,19 +70,30 @@ public class ViewBuilder implements Builder<Region>
 
     private Node createCenter()
     {
-        VBox results = new VBox(6, directoryBox(), filesBox());
+        VBox results = new VBox(6, directoryInfo(), tableView());
         results.setPadding(new Insets(20));
         return results;
     }
 
-    private Node directoryBox()
+    private Node directoryInfo()
     {
         return new HBox(6, directoryLabel("Merge csv files located in:"), boundLabel(model.inDirectoryProperty()));
     }
 
-    private Node filesBox()
+    private Node tableView()
     {
-        return new HBox();
+        TableView<FileStatus> tableView = new TableView<>(model.getFileStatuses());
+        TableColumn<FileStatus, String> fileColumn = new TableColumn<>("File Name");
+        fileColumn.setPrefWidth(400);
+        fileColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFileName()));
+
+        TableColumn<FileStatus, String> statusColumn = new TableColumn<>("Status");
+        statusColumn.setPrefWidth(150);
+        statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+
+        tableView.getColumns().add(fileColumn);
+        tableView.getColumns().add(statusColumn);
+        return tableView;
     }
 
     private Node directoryLabel(String contents)
@@ -91,8 +111,19 @@ public class ViewBuilder implements Builder<Region>
     private Node createButtons()
     {
         Button chooseButton = new Button("Choose");
+        chooseButton.setOnAction(e -> chooseHandler.accept(() -> {}));
 
         Button mergeButton = new Button("Merge");
+        BooleanProperty mergeRunning = new SimpleBooleanProperty(false);
+        mergeButton.disableProperty().bind(Bindings.createBooleanBinding(
+                () -> (!model.okToMergeProperty()
+                             .get() || mergeRunning.get()),
+                model.okToMergeProperty(),
+                mergeRunning));
+        mergeButton.setOnAction(e -> {
+            mergeRunning.set(true);
+            actionHandler.accept(() -> mergeRunning.set(false));
+        });
 
         HBox results = new HBox(10, chooseButton, mergeButton);
         results.setAlignment(Pos.CENTER);

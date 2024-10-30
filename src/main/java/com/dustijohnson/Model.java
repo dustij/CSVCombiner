@@ -1,14 +1,14 @@
 package com.dustijohnson;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class Model
 {
     private final StringProperty inDirectory = new SimpleStringProperty("");
     private final BooleanProperty okToMerge = new SimpleBooleanProperty(false);
+    public final ListProperty<FileStatus> fileStatuses = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     public String getInDirectory()
     {
@@ -38,5 +38,20 @@ public class Model
     public void setOkToMerge(boolean isValid)
     {
         okToMerge.set(isValid);
+    }
+
+    public ObservableList<FileStatus> getFileStatuses()
+    {
+        return fileStatuses.get();
+    }
+
+    public ListProperty<FileStatus> fileStatusesProperty()
+    {
+        return fileStatuses;
+    }
+
+    public void addFileStatus(FileStatus status)
+    {
+        fileStatuses.add(status);
     }
 }
