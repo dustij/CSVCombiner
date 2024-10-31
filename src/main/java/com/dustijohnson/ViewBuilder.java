@@ -9,12 +9,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import javafx.stage.Popup;
-import javafx.stage.Window;
+import javafx.scene.layout.*;
 import javafx.util.Builder;
 
 import java.util.HashMap;
@@ -51,7 +46,7 @@ public class ViewBuilder implements Builder<Region>
                                             .toExternalForm());
         results.setTop(headingLabel("Combine CSV Files"));
         results.setCenter(createCenter());
-        results.setBottom(createButtons());
+        results.setBottom(createMergeButton());
         return results;
     }
 
@@ -76,13 +71,25 @@ public class ViewBuilder implements Builder<Region>
 
     private Node directoryInfo()
     {
-        Button chooseButton = new Button("Choose");
-        chooseButton.setOnAction(e -> chooseHandler.accept(() -> {}));
-        return new VBox(
-                6,
-                chooseButton,
-                directoryLabel("Merge csv files located in:"),
-                boundLabel(model.inDirectoryProperty()));
+        GridPane gridPane = new GridPane();
+        gridPane.setHgap(12);
+        gridPane.setVgap(6);
+
+        Button chooseInButton = new Button("Input");
+        chooseInButton.setPrefSize(100, 25);
+        chooseInButton.setMinWidth(100);
+        chooseInButton.setOnAction(e -> chooseHandler.accept(() -> {}));
+
+        Button chooseOutButton = new Button("Output");
+        chooseOutButton.setPrefSize(100, 25);
+        chooseOutButton.setOnAction(e -> {});
+
+        gridPane.add(chooseInButton, 0, 0);
+        gridPane.add(new HBox(6,boundLabel(model.inDirectoryProperty())), 1, 0);
+        gridPane.add(chooseOutButton, 0, 1);
+        gridPane.add(new HBox(6, boundLabel(model.outDirectoryProperty())), 1, 1);
+
+        return gridPane;
     }
 
     private Node tableView()
@@ -113,9 +120,10 @@ public class ViewBuilder implements Builder<Region>
         return label;
     }
 
-    private Node createButtons()
+    private Node createMergeButton()
     {
         Button mergeButton = new Button("Merge");
+        mergeButton.setPrefSize(168, 77);
         BooleanProperty mergeRunning = new SimpleBooleanProperty(false);
         mergeButton.disableProperty().bind(Bindings.createBooleanBinding(
                 () -> (!model.okToMergeProperty().get() || mergeRunning.get()),

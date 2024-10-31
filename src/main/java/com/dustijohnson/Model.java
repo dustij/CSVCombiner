@@ -7,8 +7,19 @@ import javafx.collections.ObservableList;
 public class Model
 {
     private final StringProperty inDirectory = new SimpleStringProperty("");
+    private final StringProperty outDirectory = new SimpleStringProperty("");
     private final BooleanProperty okToMerge = new SimpleBooleanProperty(false);
     public final ListProperty<FileStatus> fileStatuses = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    public String getOutDirectory()
+    {
+        return outDirectory.get();
+    }
+
+    public StringProperty outDirectoryProperty()
+    {
+        return outDirectory;
+    }
 
     public String getInDirectory()
     {
