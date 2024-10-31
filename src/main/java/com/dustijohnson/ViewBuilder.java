@@ -21,10 +21,11 @@ public class ViewBuilder implements Builder<Region>
 {
     private final Model model;
     private final Consumer<Runnable> actionHandler;
-    private final Consumer<Runnable> chooseHandler;
+    private final Consumer<Runnable> chooseInHandler;
+    private final Consumer<Runnable> chooseOutHandler;
     private final Map<String, String> cssClasses;
 
-    public ViewBuilder(Model model, Consumer<Runnable> mergeHandler, Consumer<Runnable> chooseHandler)
+    public ViewBuilder(Model model, Consumer<Runnable> mergeHandler, Consumer<Runnable> chooseInHandler, Consumer<Runnable> chooseOutHandler)
     {
         cssClasses = new HashMap<>();
         cssClasses.put("headingLabel", "heading-label");
@@ -33,14 +34,15 @@ public class ViewBuilder implements Builder<Region>
 
         this.model = model;
         this.actionHandler = mergeHandler;
-        this.chooseHandler = chooseHandler;
+        this.chooseInHandler = chooseInHandler;
+        this.chooseOutHandler = chooseOutHandler;
     }
 
     @Override
     public Region build()
     {
         BorderPane results = new BorderPane();
-        results.setPrefSize(680, 600);
+        results.setPrefSize(768, 640);
         results.setPadding(new Insets(20));
         results.getStylesheets().add(Objects.requireNonNull(this.getClass().getResource("/css/csv-view.css"))
                                             .toExternalForm());
@@ -78,11 +80,11 @@ public class ViewBuilder implements Builder<Region>
         Button chooseInButton = new Button("Input");
         chooseInButton.setPrefSize(100, 25);
         chooseInButton.setMinWidth(100);
-        chooseInButton.setOnAction(e -> chooseHandler.accept(() -> {}));
+        chooseInButton.setOnAction(e -> chooseInHandler.accept(() -> {}));
 
         Button chooseOutButton = new Button("Output");
         chooseOutButton.setPrefSize(100, 25);
-        chooseOutButton.setOnAction(e -> {});
+        chooseOutButton.setOnAction(e -> chooseOutHandler.accept(() -> {}));
 
         gridPane.add(chooseInButton, 0, 0);
         gridPane.add(new HBox(6,boundLabel(model.inDirectoryProperty())), 1, 0);
@@ -96,7 +98,6 @@ public class ViewBuilder implements Builder<Region>
     {
         TableView<FileStatus> tableView = new TableView<>(model.getFileStatuses());
         TableColumn<FileStatus, String> fileColumn = new TableColumn<>("File Name");
-        fileColumn.setPrefWidth(400);
         fileColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getFileName()));
 
         TableColumn<FileStatus, String> statusColumn = new TableColumn<>("Status");
@@ -105,6 +106,10 @@ public class ViewBuilder implements Builder<Region>
 
         tableView.getColumns().add(fileColumn);
         tableView.getColumns().add(statusColumn);
+
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        statusColumn.setMinWidth(150);
+        statusColumn.setMaxWidth(150);
         return tableView;
     }
 
@@ -132,11 +137,11 @@ public class ViewBuilder implements Builder<Region>
         mergeButton.setOnAction(e -> {
             mergeRunning.set(true);
             actionHandler.accept(() -> mergeRunning.set(false));
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Merge Complete");
-            alert.setHeaderText(null);
-            alert.setContentText("The CSV files have been merged.");
-            alert.showAndWait();
+//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+//            alert.setTitle("Merge Complete");
+//            alert.setHeaderText(null);
+//            alert.setContentText("The CSV files have been merged.");
+//            alert.showAndWait();
         });
 
         HBox results = new HBox(10, mergeButton);

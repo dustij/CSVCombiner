@@ -50,17 +50,14 @@ public class Interactor
             List<Path> validFiles = service.getCsvFiles(model.getInDirectory())
                                            .stream()
                                            .filter(path -> model.getFileStatuses()
-                                                                   .stream()
-                                                                   .anyMatch(fileStatus -> fileStatus.getFileName()
-                                                                                                     .equals(path.getFileName()
-                                                                                                                 .toString()) && "Valid".equals(
-                                                                           fileStatus.getStatus())))
+                                                                .stream()
+                                                                .anyMatch(fileStatus -> fileStatus.getFileName()
+                                                                                                  .equals(path.getFileName()
+                                                                                                              .toString()) && "Valid".equals(
+                                                                        fileStatus.getStatus())))
                                            .collect(Collectors.toList());
-            service.mergeCsvFiles(
-                    validFiles,
-                    Path.of(System.getProperty("user.dir"),
-                            "output",
-                            String.format("merged_output_%s", LocalDate.now())));
+            service.mergeCsvFiles(validFiles,
+                                  Path.of(model.getOutDirectory(), String.format("merged_output_%s", LocalDate.now())));
             model.getFileStatuses().forEach(fileStatus -> fileStatus.setStatus("Complete"));
         } catch (IOException e) {
             System.err.println("Error merging files");
@@ -68,7 +65,7 @@ public class Interactor
         }
     }
 
-    public void chooseDirectory()
+    public void chooseInDirectory()
     {
         DirectoryChooser directoryChooser = new DirectoryChooser();
         directoryChooser.setInitialDirectory(model.getInDirectory().isEmpty()
@@ -78,6 +75,22 @@ public class Interactor
         File dir = directoryChooser.showDialog(new Popup());
         if (dir != null) {
             model.setInDirectory(dir.toString());
+            service.resetExpectedHeaders();
+            getFiles();
+            validateFiles();
+        }
+    }
+
+    public void chooseOutDirectory()
+    {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setInitialDirectory(model.getOutDirectory().isEmpty()
+                                                     ? new File(System.getProperty("user.dir"))
+                                                     : new File(model.getOutDirectory()));
+
+        File dir = directoryChooser.showDialog(new Popup());
+        if (dir != null) {
+            model.setOutDirectory(dir.toString());
             service.resetExpectedHeaders();
             getFiles();
             validateFiles();

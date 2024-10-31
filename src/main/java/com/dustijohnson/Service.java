@@ -89,7 +89,7 @@ public class Service
     }
 
     // Row class for unique comparison
-    private class Row
+    private static class Row
     {
         private final List<String> columns;
 

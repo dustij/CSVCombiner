@@ -4,10 +4,13 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.nio.file.Path;
+
 public class Model
 {
     private final StringProperty inDirectory = new SimpleStringProperty("");
-    private final StringProperty outDirectory = new SimpleStringProperty("");
+    private final StringProperty outDirectory = new SimpleStringProperty(Path.of(System.getProperty("user.dir"),
+                                                                                 "output").toString());
     private final BooleanProperty okToMerge = new SimpleBooleanProperty(false);
     public final ListProperty<FileStatus> fileStatuses = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -19,6 +22,11 @@ public class Model
     public StringProperty outDirectoryProperty()
     {
         return outDirectory;
+    }
+
+    public void setOutDirectory(String directory)
+    {
+        outDirectory.set(directory);
     }
 
     public String getInDirectory()

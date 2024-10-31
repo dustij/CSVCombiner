@@ -13,14 +13,20 @@ public class Controller
     {
         model = new Model();
         interactor = new Interactor(model, new Service());
-        viewBuilder = new ViewBuilder(model, this::mergeFiles, this::chooseDirectory);
+        viewBuilder = new ViewBuilder(model, this::mergeFiles, this::chooseInDirectory, this::chooseOutDirectory);
         setPropertyListener();
     }
 
-    private void chooseDirectory(Runnable postActionGuiCleanup)
+    private void chooseInDirectory(Runnable postAction)
     {
-        interactor.chooseDirectory();
-        postActionGuiCleanup.run();
+        interactor.chooseInDirectory();
+        postAction.run();
+    }
+
+    private void chooseOutDirectory(Runnable postAction)
+    {
+        interactor.chooseOutDirectory();
+        postAction.run();
     }
 
     public Region getView()
