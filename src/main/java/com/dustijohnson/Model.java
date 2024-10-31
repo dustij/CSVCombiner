@@ -4,15 +4,43 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.Properties;
 
 public class Model
 {
-    private final StringProperty inDirectory = new SimpleStringProperty("");
-    private final StringProperty outDirectory = new SimpleStringProperty(Path.of(System.getProperty("user.dir"),
-                                                                                 "output").toString());
+    private final StringProperty inDirectory = new SimpleStringProperty(envInputDirectory());
+    private final StringProperty outDirectory = new SimpleStringProperty(envOutputDirectory());
     private final BooleanProperty okToMerge = new SimpleBooleanProperty(false);
-    public final ListProperty<FileStatus> fileStatuses = new SimpleListProperty<>(FXCollections.observableArrayList());
+    private final ListProperty<FileStatus> fileStatuses = new SimpleListProperty<>(FXCollections.observableArrayList());
+
+    private String envInputDirectory()
+    {
+        return System.getenv("INPUT_DIR") != null ? System.getenv("INPUT_DIR") : "";
+    }
+
+    private String envOutputDirectory()
+    {
+        return System.getenv("OUTPUT_DIR") != null ? System.getenv("OUTPUT_DIR") : "";
+    }
+
+//    public Model()
+//    {
+//        Properties properties = new Properties();
+//        try (InputStream input = new FileInputStream("locations")) {
+//            properties.load(input);
+//            inDirectory = new SimpleStringProperty(properties.getProperty("input", ""));
+//            outDirectory = new SimpleStringProperty(properties.getProperty("output",
+//                                                                                 Path.of(System.getProperty("user.dir"),
+//                                                                                         "output").toString()));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     public String getOutDirectory()
     {
