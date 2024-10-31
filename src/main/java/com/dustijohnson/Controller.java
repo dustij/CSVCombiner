@@ -15,6 +15,9 @@ public class Controller
         interactor = new Interactor(model, new Service());
         viewBuilder = new ViewBuilder(model, this::mergeFiles, this::chooseInDirectory, this::chooseOutDirectory);
         setPropertyListener();
+        // Try getting files on startup from default directory
+        interactor.getFiles();
+        interactor.validateFiles();
     }
 
     private void chooseInDirectory(Runnable postAction)
